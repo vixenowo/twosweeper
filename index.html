@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>MineSweeper</title>
+  <style>
+    @font-face {
+      font-family: 'Digital Display';
+      src: url('fonts/Digital-Display.woff2') format('woff2'),
+        url('fonts/Digital-Display.woff') format('woff'),
+        url('fonts/Digital-Display.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .content {
+      width: 400px;
+      height: 300px;
+    }
+
+    .main {
+      width: 100%;
+      height: 100%;
+      border: 4px outset white;
+      background-color: rgb(198, 198, 198);
+    }
+
+    .header {
+      margin: 5px;
+    }
+
+    .inside {
+      padding: 3px;
+      display: flex;
+    }
+
+    .inside .a {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: left;
+    }
+
+    .inside .b {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .inside .c {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: right;
+    }
+
+
+
+    .counter {
+      background-color: black;
+      color: red;
+      font-family: 'Digital Display';
+      font-size: 30px;
+      padding: 2px;
+      width: max-content;
+      border: 2px outset white;
+    }
+
+    .game {
+      width: 100%;
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .minesweep {
+      display: grid;
+      grid-template-columns: repeat(2, 20px);
+    }
+
+    .item {
+      width: 15px;
+      height: 15px;
+      border: 2px outset white;
+      background-color: rgb(207, 207, 207);
+      position: relative;
+    }
+
+    .smile{
+      width: 50px;
+      height: 20px;
+      border: 2px outset white;
+      background-color: rgb(207, 207, 207);
+      font-size: 15px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .smile:active{
+      border: 2px inset white;
+  
+    }
+
+    .smile span{
+      margin-top: -2px;
+    }
+
+    .flag {
+      background: url('flag.png') no-repeat center center;
+      background-size: contain;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <div class="main">
+      <div class="header">
+        <div class="inside">
+          <div class="a">
+            <div id="bombs" class="counter">001</div>
+          </div>
+          <div class="b">
+            <button id="playAgainBtn" class="smile"><span id="smile">owo</span></button>
+          </div>
+          <div class="c">
+            <div id="flags" class="counter">001</div>
+          </div>
+        </div>
+      </div>
+      <div class="game">
+        <div class="minesweep">
+          <div class="item" id="box1"></div>
+          <div class="item" id="box2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const boxes = [document.getElementById('box1'), document.getElementById('box2')];
+    let isFlagged = false;
+    let mineIndex, safeIndex;
+    const borderThickness = "2px";
+
+    function initGame() {
+      mineIndex = Math.floor(Math.random() * 2);
+      safeIndex = (mineIndex + 1) % 2;
+      console.log('Mine index:', mineIndex);
+    }
+
+    function flagBox(index) {
+      if (!isFlagged) {
+        document.getElementById('flags').innerText = "000"
+        boxes[index].classList.add('flag');
+        isFlagged = true;
+      }
+    }
+
+    function sweepBox(index) {
+      if (!isFlagged) {
+        document.getElementById('smile').innerText = ">w>"
+        return;
+      }
+
+      if (index === mineIndex) {
+        var audio = new Audio('dead.mp3');
+        audio.play();
+        document.getElementById('smile').innerText = "xwx"
+        boxes[index].style.backgroundImage = "url('mine.png')";
+        boxes[index].style.backgroundSize = "contain";
+        boxes[index].style.border = `${borderThickness} inset white`;
+      } else {
+        var audio = new Audio('notdead.mp3');
+        audio.play();
+        document.getElementById('smile').innerText = "uwu"
+        document.getElementById('bombs').innerText = "000"
+        boxes[index].style.border = `${borderThickness} inset white`;
+      }
+    }
+
+    boxes.forEach((box, index) => {
+        box.oncontextmenu = function(e) {
+          e.preventDefault(); 
+          flagBox(index);
+        };
+
+        box.onmousedown = function(e) {
+          if (e.button === 2) { 
+        document.getElementById('smile').innerText = ">w<"
+          }
+        };
+
+        box.onmouseup = function(e) {
+          if (e.button === 2) { 
+        document.getElementById('smile').innerText = "owo"
+          }
+        };
+
+        box.onclick = function() {
+          sweepBox(index);
+        };
+    });
+    
+    document.getElementById('playAgainBtn').onclick = function() {
+      isFlagged = false;
+  mineIndex = null;
+  safeIndex = null;
+
+  // Clear box appearances
+  boxes.forEach(box => {
+        document.getElementById('flags').innerText = "001"
+        document.getElementById('bombs').innerText = "001"
+        document.getElementById('smile').innerText = "owo"
+    box.classList.remove('flag', 'mine', 'safe');
+    box.style.backgroundImage = ''; // Clear the mine image
+    box.style.border = '2px outset white'; // Reset the border style
+    box.style.backgroundColor = 'rgb(207, 207, 207)'; // Reset background color
+  });
+
+  // Reinitialize the game
+  initGame();
+    };
+
+    initGame();
+  </script>
+</body>
+
+</html>

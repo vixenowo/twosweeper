@@ -1,0 +1,40 @@
+{
+  "name": "minesweeper",
+  "productName": "MineSweeper",
+  "version": "1.0.0",
+  "main": "index.js", 
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.blitzen.minesweeper",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",  
+          "arch": [
+            "x64"         
+          ]
+        }
+      ]
+    },
+    "files": [
+      "build/**/*",
+      "index.js", 
+      "index.html", 
+      "dead.mp3", 
+      "flag.png", 
+      "mine.png", 
+      "notdead.mp3", 
+      "fonts/**/*" 
+    ],
+    "directories": {
+      "output": "dist" 
+    }
+  },
+  "devDependencies": {
+    "electron": "^31.1.0",
+    "electron-builder": "^25.1.8"
+  }
+}
